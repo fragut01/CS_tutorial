@@ -1,0 +1,70 @@
+### ---------------------------------------------------------------------------
+### Dockerfile to build an image of the Lbfgs & Curvelets python library.
+### Author: Javier Gutiérrez Oliet <fj.gutierrez@beca.repsol.com>
+### First   version: 2021/4/8
+### Current version: 2021/5/31
+### ---------------------------------------------------------------------------
+FROM ubuntu:18.04
+SHELL ["/bin/bash", "-c"]
+
+LABEL description="Build the Lbfgs & Curvelets python library."
+LABEL maintainer="Javier Gutierrez Oliet <fj.gutierrez@beca.repsol.com>"
+
+### NOTE: Unlike ARG, ENV variables persists after the build.
+ARG DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 \
+    http_proxy=$http_proxy https_proxy=$https_proxy
+ENV CURVE_NAME=CurveLab-2.1.3
+ENV PYCURVELAB_NAME=PyCurvelab-master
+ENV CURVE_FILE=${CURVE_NAME}.tar
+ENV CONTEXT_WORK_PATH=.
+ENV DOCKER_WORK_PATH=/tmp
+ENV PREFIX=/usr/local/lib/
+ENV FDCT=${DOCKER_WORK_PATH}/${CURVE_NAME} \
+    FFTW=/usr/lib
+WORKDIR ${DOCKER_WORK_PATH}
+
+### Install the LBFGS library dependencies.
+RUN apt-get update && apt-get install --no-install-recommends -y  unzip libpcre3 libpcre3-dev swig fftw2 fftw-dev automake build-essential ca-certificates cmake curl git libspatialindex-dev \
+    libsuitesparse-dev libtool python3-dev python3-pip python3-setuptools python3-tk python3-wheel vim \
+&&  pip3 install Cython numpy scipy sympy \
+&&  pip3 install scikit-sparse RTree matplotlib obspy ipython cvxpy imageio jupyter jupyterlab jupyter_packaging \ 
+&&  ln -s /usr/bin/python3 /usr/bin/python \
+&&  ln -s /usr/bin/pip3 /usr/bin/pip
+# Borrar cosas del apt y del pip3
+# apt-get autoclean o clean?
+
+### Install the LBFGS library.
+COPY ${CONTEXT_WORK_PATH}/liblbfgs-master.zip ${DOCKER_WORK_PATH}/.
+RUN unzip liblbfgs-master.zip \
+&&  cd liblbfgs-master \
+&&  ./autogen.sh \
+&&  ./configure --enable-sse2 \
+&&  make \
+&&  make install \
+&&  cd - 
+
+# Install the LBFGS  python wrapper.
+COPY ${CONTEXT_WORK_PATH}/rtaylor-pylbfgs.zip ${DOCKER_WORK_PATH}/.
+RUN unzip rtaylor-pylbfgs.zip \
+&&  cd rtaylor-pylbfgs-* \ 
+&&  python3 setup.py install \
+&&  cd -
+
+### We should now pass a build context.
+### Currently the file is at /home/SE79065/projects/OSA_misc/CS_context
+### Install the PyCurvelab dependencies
+COPY ${CONTEXT_WORK_PATH}/${CURVE_FILE}.gz ${DOCKER_WORK_PATH}/.
+RUN gunzip ${DOCKER_WORK_PATH}/${CURVE_FILE}.gz \
+&&  tar xvf ${DOCKER_WORK_PATH}/${CURVE_FILE} \
+&&  make -C ${DOCKER_WORK_PATH}/${CURVE_NAME}
+
+COPY ${CONTEXT_WORK_PATH}/PyCurvelab-master.zip ${DOCKER_WORK_PATH}/.
+RUN unzip PyCurvelab-master.zip \
+&&  cd ${PYCURVELAB_NAME} && python3 setup.py build install && cd - \
+&&  cp ${DOCKER_WORK_PATH}/${PYCURVELAB_NAME}/pyct/fdct2_wrapper.py ${PREFIX}/python3.6/dist-packages/pyct/. \
+&&  cp ${DOCKER_WORK_PATH}/${PYCURVELAB_NAME}/pyct/fdct3_wrapper.py ${PREFIX}/python3.6/dist-packages/pyct/.
+
+# BOrrarcosas intermedias
+WORKDIR /home
+CMD [ "/bin/bash" ]
