@@ -1,0 +1,70 @@
+%%% Read the segy file and extract the size of the array
+D = read_segy_file('C:\Users\SE79065\Documents\CompressiveSensing\gob_20200731_synthetic_shot-gather.sgy');
+D = D.traces;
+D = D(500:599,250:349);%To experiment w/ less memory (more iterations)
+nt = size(D,1);
+nr = size(D,2);
+%%% Normalize the data
+%D = log10(1+1e3*abs(D)).*sign(D);
+
+%%% Visualize the original data
+figure(1);
+imagesc(D); colormap('redblue'); colorbar;
+title('Original data'); caxis([-1000,1000]);
+xlabel('Traces'); ylabel('Time samples')
+
+%%% Seed the random number generator and the subsampling factor
+rng(123456789);
+p = 0.5;
+%%% Create a random permutation of the receiver indices
+idx = randperm(nr);
+idx = sort(idx(1:round(nr*p)));
+%%% Create the sampling operator (to drop the traces)
+R = opKron(opRestriction(nr, idx), opDirac(nt));
+%%% Take out the dropped traces
+RD = R*D(:);
+%%% Re-insert the traces w/ missing data
+Dest_adj = reshape(R'*RD(:), nt, nr);
+
+%%% Visualize the missing data
+figure(2);
+imagesc(Dest_adj); colormap('redblue'); colorbar;
+title('Dropped traces'); caxis([-1000,1000]);
+xlabel('Traces'); ylabel('Time samples')
+
+%%% Create the sensing operator (we will create F, the DFT operator, and then
+%%% take the traspose since it is an orthonormal basis
+F = opDFT2(nt, nr);
+%%% Create the caption vector 'y' using the operator RD
+y = RD(:);
+%%% Create the sensing matrix Psi based on Gaussian dist.
+Psi = opGaussian(nr*nt*p,nt*nr,3);
+%%% Let Phi be the inverse Fourier transform operator F^t
+%%% Create the Theta operator as the product of Psi@Phi
+T = Psi*F';
+%%% Set the options for the basis pursuit solver
+options = spgSetParms('optTol', 5e-3, 'bpTol', 5e-3,...
+    'iterations', 100, 'verbosity', 1);
+%%% Now solve the \ell_1 min problem
+xest = spg_bp(T, y, options);
+
+%%% Transform the solution to the temporal domain w/ the original shape
+dest = F'*xest;
+Dest = reshape(dest, nt, nr);
+%%% Determine the accuracy of the recover by computing the residual and the
+%%% signal-to-noise ratio (SNR)
+Ddiff = D - Dest;
+SNR = -20*log10(norm(Ddiff(:))/norm(D(:)));
+
+%%% Visualize the results
+figure(3);
+imagesc(real(Dest)); colormap('redblue'); colorbar;
+title('Basis Pursuit Recovery'); caxis([-1000, 1000]);
+xlabel('Traces'); ylabel('Time sample')
+
+figure(4);
+imagesc(real(Ddiff)); colormap('redblue'); colorbar;
+title('Basis Pursuit Recovery'); caxis([-1000, 1000]);
+xlabel('Traces'); ylabel('Time sample')
+
+
