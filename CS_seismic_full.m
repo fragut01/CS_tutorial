@@ -1,7 +1,7 @@
-%%% Read the segy file and extract the size of the array
+%%% Read the segy file and extract the size of the array (the path should
+%%% be where the .sgy file was downloaded).
 D = read_segy_file('C:\Users\SE79065\Documents\CompressiveSensing\gob_20200731_synthetic_shot-gather.sgy');
 D = D.traces;
-%D = D(:,150:350);%To experiment w/ less memory (more iterations)
 nt = size(D,1);
 nr = size(D,2);
 %%% Normalize the data
@@ -35,6 +35,8 @@ xlabel('Traces'); ylabel('Time samples')
 %%% Create the sensing operator (we will create F, the DFT operator, and then
 %%% take the traspose since it is an orthonormal basis
 F = opDFT2(nt, nr);
+%F = opWavelet2(nt,nr,'Daubechies');
+%F = opWavelet2(nt,nr,'Haar');
 %F2 = opCurvelet
 %%% Create the caption vector 'y' using the operator RD
 y = RD(:);
