@@ -4,7 +4,7 @@
 >
 > - Additionally, csDockerfile is a dockerfile constructed with the dependencies needed to replicate the Python routines. In order to build an image with it, you have to run the following command:
 > ```
-> docker build -f (path to csDockerfile) .
+> docker build -f (path to csDockerfile) (path to context)
 > ```
 >
 > - Also, you can find the PDF version of my thesis.
