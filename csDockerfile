@@ -31,8 +31,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y  unzip libpcre3
 &&  pip3 install scikit-sparse RTree matplotlib obspy ipython cvxpy imageio jupyter jupyterlab jupyter_packaging \ 
 &&  ln -s /usr/bin/python3 /usr/bin/python \
 &&  ln -s /usr/bin/pip3 /usr/bin/pip
-# Borrar cosas del apt y del pip3
-# apt-get autoclean o clean?
 
 ### Install the LBFGS library.
 COPY ${CONTEXT_WORK_PATH}/liblbfgs-master.zip ${DOCKER_WORK_PATH}/.
@@ -51,8 +49,6 @@ RUN unzip rtaylor-pylbfgs.zip \
 &&  python3 setup.py install \
 &&  cd -
 
-### We should now pass a build context.
-### Currently the file is at /home/SE79065/projects/OSA_misc/CS_context
 ### Install the PyCurvelab dependencies
 COPY ${CONTEXT_WORK_PATH}/${CURVE_FILE}.gz ${DOCKER_WORK_PATH}/.
 RUN gunzip ${DOCKER_WORK_PATH}/${CURVE_FILE}.gz \
