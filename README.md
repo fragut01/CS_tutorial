@@ -7,6 +7,8 @@
 > docker build -f (path to csDockerfile) (path to context)
 > ```
 >
+> - The Matlab functions needed to replicate the scripts are also available to download in the "Matlab_dependencies" folder.
+>
 > - Also, you can find the PDF version of my thesis.
 >
 > **IMPORTANT**: in order to get the files to work as expected, the paths to read the image (LOLA.jpg) and the SEGY file (gob_20200731_synthetic_shot-gather.sgy) need to be changed to your own.
