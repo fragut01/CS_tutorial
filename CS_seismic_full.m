@@ -32,8 +32,8 @@ imagesc(Dest_adj); colormap('redblue'); colorbar;
 title('Dropped traces'); caxis([-1000,1000]);
 xlabel('Traces'); ylabel('Time samples')
 
-%%% Create the sensing operator (we will create F, the DFT operator, and then
-%%% take the traspose since it is an orthonormal basis
+%%% Create the sensing operator (we will create F, the DFT/Wavelet operator, and then
+%%% take the transpose since it is an orthonormal basis
 F = opDFT2(nt, nr);
 %F = opWavelet2(nt,nr,'Daubechies');
 %F = opWavelet2(nt,nr,'Haar');
