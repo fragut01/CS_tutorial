@@ -1,0 +1,13 @@
+2021-09-17  Uwe Brauer  <oub@mat.ucm.es>
+
+	* CS_seismic_full.m (Read the segy file and extract the size of
+	the array (the path should): 21 purpose of this code is a bit opaque 
+
+	* lola_CS.py (main): 21 some documentation, but what is the purpose of this file?
+
+	* FFT1D.ipynb: 21 no documentation
+
+	* CS1D_l1.ipynb: 21 no documentation
+
+	* CS1D_greedy.ipynb: 21 no documentation
+
