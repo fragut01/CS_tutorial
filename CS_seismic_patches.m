@@ -44,11 +44,9 @@ F = opDFT2(nt, nr);
 %F2 = opCurvelet
 %%% Create the caption vector 'y' using the operator RD
 y = RD(:);
-%%% Create the sensing matrix Psi based on Gaussian dist.
-Psi = opGaussian(nr*nt*p,nt*nr,3);
-%%% Let Phi be the inverse Fourier transform operator F^t
-%%% Create the Theta operator as the product of Psi@Phi
-T = Psi*F';
+%%% Create the Theta operator by taking random samples of the inverse
+%%% Fourier transform operator F^t
+T = R*F';
 %%% Set the options for the basis pursuit solver
 options = spgSetParms('optTol', 5e-3, 'bpTol', 5e-3,...
     'iterations', 100, 'verbosity', 1);
@@ -71,7 +69,7 @@ xlabel('Traces'); ylabel('Time sample')
 
 figure(4);
 imagesc(real(Ddiff)); colormap('redblue'); colorbar;
-title('Basis Pursuit Recovery'); caxis([-1000, 1000]);
+title('Residual'); caxis([-1000, 1000]);
 xlabel('Traces'); ylabel('Time sample')
 
 

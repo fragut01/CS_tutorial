@@ -7,7 +7,7 @@
 > docker build -f (path to csDockerfile) (path to context)
 > ```
 >
-> - The Matlab functions needed to replicate the scripts are also available to download in the "Matlab_dependencies" folder.
+> - The Matlab functions needed to replicate the scripts are also available to download in the "Matlab_dependencies" folder. (once downloaded, you need to add to the path the folder "Matlab_dependencies").
 >
 > - Also, you can find the PDF version of my thesis.
 >
