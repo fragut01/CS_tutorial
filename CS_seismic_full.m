@@ -1,7 +1,7 @@
 %%% Read the segy file and extract the size of the array (the path should
 %%% be where the .sgy file was downloaded).
-D = read_segy_file('C:\Users\SE79065\OneDrive - Repsol\CompressiveSensing\git\gob_20200731_synthetic_shot-gather.sgy');
-D = D.traces;
+D = read_segy_file('gob_20200731_synthetic_shot-gather.sgy');
+D=D.traces;
 nt = size(D,1);
 nr = size(D,2);
 %%% Normalize the data
